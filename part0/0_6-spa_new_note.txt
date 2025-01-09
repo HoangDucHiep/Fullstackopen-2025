@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant browser
+    participant server
+
+    user enter data
+    click submit
+
+    spa.js get input from form element
+    then prevens default handling,
+    create new note object
+    add note to DOM
+
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+    server save note
+
+    server-->browser: HTTP Status code 201 Created
+    server-->browser: {"message":"note created"}
