@@ -6,21 +6,21 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
-  const updateFeedBack = (current, update) => {
-    return () => update(current + 1);
+  const updatevalue = (current, update) => {
+    return () => {
+      const newValue = current + 1;
+      update(newValue);
+    }
   }
 
   return (
     <div>
-      <h1> give feedback</h1>
-      <Button onClick={updateFeedBack(good, setGood)}>good</Button>
-      <Button onClick={updateFeedBack(neutral, setNeutral)}>neutral</Button>
-      <Button onClick={updateFeedBack(bad, setBad)}>bad</Button>
-      
-      <h1>statistics</h1>
-      <StaticItem options={'good'} feedback={good}></StaticItem>
-      <StaticItem options={'neutral'} feedback={neutral}></StaticItem>
-      <StaticItem options={'bad'} feedback={bad}></StaticItem>
+      <h1> give value</h1>
+      <Button onClick={updatevalue(good, setGood)}>good</Button>
+      <Button onClick={updatevalue(neutral, setNeutral)}>neutral</Button>
+      <Button onClick={updatevalue(bad, setBad)}>bad</Button>
+
+      <Statistics statistics={[good, neutral, bad]}></Statistics>
     </div>
   )
 }
@@ -34,10 +34,41 @@ const Button = ({ children, onClick }) => {
   )
 }
 
-const StaticItem = ({ options, feedback }) => {
+const StatisticLine = ({ text, value }) => {
   return (
-    <p>{options} { feedback }</p>
+    <tbody>
+      <tr>
+        <td>{text}:</td>
+        <td>{value}</td>
+      </tr>
+    </tbody>
   )
+}
+
+const Statistics = ({ statistics }) => {
+  let good = statistics[0];
+  let neutral = statistics[1];
+  let bad = statistics[2];
+
+  let all = good + bad + neutral;
+  let average = (good - bad) / all;
+  let positive = good / all * 100;
+
+  return (all !== 0 ? (
+    <>
+      <h1>StatisticLine</h1>
+      <table>
+        <StatisticLine text={'good'} value={good}></StatisticLine>
+        <StatisticLine text={'neutral'} value={neutral}></StatisticLine>
+        <StatisticLine text={'bad'} value={bad}></StatisticLine>
+        <StatisticLine text={'all'} value={all}></StatisticLine>
+        <StatisticLine text={'average'} value={average}></StatisticLine>
+        <StatisticLine text={'positive'} value={positive + '%'}></StatisticLine>
+      </table>
+    </>
+  ) : (
+    <p>No value given</p>
+  ));
 }
 
 export default App
