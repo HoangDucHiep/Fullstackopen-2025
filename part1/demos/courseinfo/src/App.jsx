@@ -49,7 +49,7 @@ const App = () => {
 }
 
 
-const Display = (props) => {
+/* const Display = (props) => {
   return (
     <div>{props.children}</div>
   );
@@ -61,7 +61,7 @@ const Button = (props) => {
       {props.children}
     </button>
   );
-}
+} */
 
 
 

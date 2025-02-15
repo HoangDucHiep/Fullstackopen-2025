@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import Persons from './components/Persons';
+import Notification from './components/Notification';
 import PersonForm from "./components/PersonForm";
 import { FormInput } from "./components/PersonForm";
 import phonesService from "./services/phones";
 
 const App = () => {
   const [persons, setPersons] = useState([])
+  const [notiMessage, setNotiMessage] = useState(null)
+  const [notifType, setType] = useState("notif")
 
   useEffect(() => {
     phonesService
@@ -48,14 +51,20 @@ const App = () => {
 
     if (findByName) {
       // change number if name existed
-      if (window.confirm(`${findByName.name} is already added to phonebook, replace the old number (${findByName.number}) with a new one`))
-      {
+      if (window.confirm(`${findByName.name} is already added to phonebook, replace the old number (${findByName.number}) with a new one`)) {
         phonesService
           .updatePhone(findByName.id, newPhone)
           .then(data => {
             setPersons(persons.map(c => c.name === findByName.name ? data : c))
             setNewName("")
             setNewNumber("")
+            setType("notif")
+            setNotiMessage(
+              `Changed ${data.name}`
+            )
+            setTimeout(() => {
+              setNotiMessage(null)
+            }, 5000)
           })
           .catch(error => {
             console.error("Error update phone entry:", error);
@@ -64,26 +73,30 @@ const App = () => {
       return
     } else if (findByNumber) {
       // change name if number existed
-      if (window.confirm(`${findByNumber.number} is already added to phonebook, replace the old name (${findByNumber.number}) with a new one`))
-        {
-          phonesService
-            .updatePhone(findByNumber.id, newPhone)
-            .then(data => {
-              setPersons(persons.map(c => c.number === findByNumber.number ? data : c))
-              setNewName("")
-              setNewNumber("")
-              .catch(error => {
-                console.error("Error update phone entry:", error);
-              });
-            })
-        }
-        return
+      if (window.confirm(`${findByNumber.number} is already added to phonebook, replace the old name (${findByNumber.number}) with a new one`)) {
+        phonesService
+          .updatePhone(findByNumber.id, newPhone)
+          .then(data => {
+            setPersons(persons.map(c => c.number === findByNumber.number ? data : c))
+            setNewName("")
+            setNewNumber("")
+            setType("notif")
+            setNotiMessage(
+              `Changed ${data.name}`
+            )
+            setTimeout(() => {
+              setNotiMessage(null)
+            }, 5000)
+          })
+          .catch(error => {
+            console.error("Error update phone entry:", error);
+          });
+      }
+      return
     } else if (!newName || !newNumber) {
       alert(`please fill all inputs`)
       return
     }
-
-    
 
     phonesService
       .create(newPhone)
@@ -91,6 +104,13 @@ const App = () => {
         setPersons(persons.concat(data))
         setNewName("")
         setNewNumber("")
+        setType("notif")
+        setNotiMessage(
+          `Added ${data.name}`
+        )
+        setTimeout(() => {
+          setNotiMessage(null)
+        }, 5000)
       })
       .catch(error => {
         console.error("Error creating new phone entry:", error);
@@ -115,6 +135,13 @@ const App = () => {
         })
         .catch(error => {
           console.error("Error deleting phone entry:", error);
+          setType("error")
+          setNotiMessage(
+            `Failed to delete`
+          )
+          setTimeout(() => {
+            setNotiMessage(null)
+          }, 5000)
         });
     }
   }
@@ -122,6 +149,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notiMessage} type={notifType} />
       <FormInput input={{ lable: "filter shown with", value: filter, onChangeFunc: handleFilterInput }}></FormInput>
       <h2>Add a new</h2>
       <PersonForm onSubmit={addNew} inputs={inputs}></PersonForm>
