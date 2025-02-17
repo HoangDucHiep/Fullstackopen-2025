@@ -1,0 +1,23 @@
+### get all
+GET http://localhost:3001/api/persons
+
+### get one exist
+GET http://localhost:3001/api/persons/1
+
+### get one does not exist
+GET http://localhost:3001/api/persons/100
+
+### delete phone id 1
+DELETE http://localhost:3001/api/persons/1
+
+### delete phone id 100
+DELETE http://localhost:3001/api/persons/100
+
+### add new phone
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "new phone 3",
+    "number": "1234567890"
+}
