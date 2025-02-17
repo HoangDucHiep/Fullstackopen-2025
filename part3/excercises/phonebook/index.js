@@ -1,8 +1,8 @@
 const express = require("express");
 var morgan = require('morgan');
+const cors = require('cors');
 const app = express();
 const PORT = 3001;
-
 
 morgan.token('body', (req, res) => JSON.stringify(req.body));
 
