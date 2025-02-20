@@ -6,7 +6,7 @@ const PORT = 3001;
 
 morgan.token('body', (req, res) => JSON.stringify(req.body));
 
-app.use(express.static('build'));
+app.use(express.static('dist'));
 app.use(express.json());
 app.use(cors());
 app.use(morgan('tiny'));
@@ -77,8 +77,14 @@ app.get("/api/persons/:id", (req, res) => {
 // delete
 app.delete("/api/persons/:id", (req, res) => {
     const id = req.params.id;
-    persons = persons.filter(p => p.id !== id);
-    res.status(204).end();
+    const person = persons.find(p => p.id === id);
+
+    if (person) {
+        persons = persons.filter(p => p.id !== id);
+        res.json(person);
+    } else {
+        res.status(404).json({ error: "person not found" });
+    }
 })
 
 // add
@@ -100,7 +106,7 @@ app.post("/api/persons", (req, res) => {
     }
 
     const person = {
-        id: Math.floor(Math.random() * 1000),
+        id: Math.floor(Math.random() * 1000).toString(),
         name: body.name,
         number: body.number
     }
