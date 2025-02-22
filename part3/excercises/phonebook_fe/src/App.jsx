@@ -41,12 +41,12 @@ const App = () => {
   const addNew = e => {
     e.preventDefault()
 
-    const findByName = persons.find(c => c.name === newName)
-    const findByNumber = persons.find(c => c.number === newNumber)
+    const findByName = persons.find(c => c.name === newName.trim())
+    const findByNumber = persons.find(c => c.number === newNumber.trim())
 
     const newPhone = {
-      name: newName,
-      number: newNumber,
+      name: newName.trim(),
+      number: newNumber.trim(),
     }
 
     if (findByName) {

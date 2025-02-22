@@ -9,7 +9,9 @@ primary_region = 'sin'
 [build]
 
 [env]
-  PORT = "30011" # add this
+  PORT = "3001" # add this
+  MONGODB_URI="mongodb+srv://hunghiephainhuan1412:Hunghiephainhuan1412@cluster0.g3yh9.mongodb.net/phonebook?retryWrites=true&w=majority&appName=Cluster0"
+  MONGODB_URI_PASSWORD="Hunghiephainhuan1412"
 
 [http_service]
   internal_port = 3001
