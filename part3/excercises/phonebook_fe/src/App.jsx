@@ -67,7 +67,11 @@ const App = () => {
             }, 5000)
           })
           .catch(error => {
-            console.error("Error update phone entry:", error);
+            setType("error")
+            setNotiMessage(error.response.data.error)
+            setTimeout(() => {
+              setNotiMessage(null)
+            }, 5000);
           });
       }
       return
@@ -89,7 +93,11 @@ const App = () => {
             }, 5000)
           })
           .catch(error => {
-            console.error("Error update phone entry:", error);
+            setType("error")
+            setNotiMessage(error.response.data.error)
+            setTimeout(() => {
+              setNotiMessage(null)
+            }, 5000);
           });
       }
       return
@@ -113,7 +121,11 @@ const App = () => {
         }, 5000)
       })
       .catch(error => {
-        console.error("Error creating new phone entry:", error);
+        setType("error")
+        setNotiMessage(error.response.data.error)
+        setTimeout(() => {
+          setNotiMessage(null)
+        }, 5000);
       });
   }
 
