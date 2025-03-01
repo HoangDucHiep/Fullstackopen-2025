@@ -1,0 +1,10 @@
+### post one
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Hello world",
+    "author": "Hoang Duc Hiep",
+    "url": "http://newurl.com",
+    "likes": 1000
+}
