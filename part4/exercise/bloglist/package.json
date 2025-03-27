@@ -4,13 +4,14 @@
   "description": "blog list application",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development node --watch index.js",
+    "test": "cross-env  NODE_ENV=test node --test",
     "build": "vite build",
     "build:ui": "@powershell Remove-Item -Recurse -Force dist && cd ../phonebook_fe && npm run build && @powershell Copy-Item dist -Recurse ../phonebook",
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
     "logs:prod": "fly logs",
-    "test": "node --test",
     "lint": "eslint ."
   },
   "author": "HoangDucHiep",
@@ -19,9 +20,14 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-async-errors": "^3.1.1",
     "lodash": "^4.17.21",
     "mongoose": "^8.11.0",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.9"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "supertest": "^7.1.0"
   }
 }
