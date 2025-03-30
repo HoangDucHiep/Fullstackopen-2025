@@ -9,11 +9,31 @@ const helper = require('./test_helper')
 
 const Blog = require('../models/blog')
 const assert = require('assert')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const User = require('../models/user')
+
 
 describe('Blog API tests', () => { 
+
+    let token;
+
     beforeEach(async () => {
         await Blog.deleteMany({})
-        await Blog.insertMany(helper.initialBlogs)
+        await User.deleteMany({})
+
+        const passwordHash = await bcrypt.hash('password', 10)
+        const user = new User({ username: 'root', passwordHash })
+        await user.save()
+
+        token = jwt.sign({ id: user.id }, process.env.SECRET)
+        
+        const blogsWithUser = helper.initialBlogs.map(blog => ({
+            ...blog,
+            user: user.id
+        }))
+        
+        await Blog.insertMany(blogsWithUser)
     })
 
     test.only('blogs are returned as json', async t => { 
@@ -25,7 +45,6 @@ describe('Blog API tests', () => {
 
     test.only('there are 3 blogs', async t => {
         const response = await api.get('/api/blogs')
-        console.log(response.body.length)
         assert.strictEqual(response.body.length, 3)
     })
 
@@ -47,6 +66,7 @@ describe('Blog API tests', () => {
 
         const response = await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -54,9 +74,24 @@ describe('Blog API tests', () => {
         const blogsAtEnd = await Blog.find({})
         assert.strictEqual(blogsAtEnd.length, oldBlogs.length + 1)
         
-        // check if the new blog is in the list of blogs
         const contents = blogsAtEnd.map(blog => blog.title)
         assert.ok(contents.includes(newBlog.title))
+    })
+
+    test.only("add token without a token, respond with 401", async t => {
+        const newBlog = {
+            "title": "test",
+            "author": "Hoang Duc Hiep",
+            "url": "http://newurl.com"
+        }
+
+        const response = await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(401)
+            .expect('Content-Type', /application\/json/)
+        
+        assert.strictEqual(response.body.error, 'token missing')
     })
 
     test.only('if likes property is missing, it will default to 0', async t => {
@@ -68,6 +103,7 @@ describe('Blog API tests', () => {
 
         const response = await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -85,6 +121,7 @@ describe('Blog API tests', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(newBlog)
             .expect(400)
             .expect('Content-Type', /application\/json/)
@@ -97,7 +134,8 @@ describe('Blog API tests', () => {
 
         await api
             .delete(`/api/blogs/${blogToDelete.id}`)
-            .expect(204)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200)
 
         const blogsAtEnd = await Blog.find({})
         assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1)
@@ -117,13 +155,13 @@ describe('Blog API tests', () => {
 
         const res = await api
             .put(`/api/blogs/${blogToUpdate.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .send(updatedBlog)
             .expect(200)
             .expect('Content-Type', /application\/json/)
         
         const blog = res.body
         assert.strictEqual(blog.likes, updatedBlog.likes)
-
         assert.strictEqual(blog.title, updatedBlog.title)
         assert.strictEqual(blog.author, updatedBlog.author)
         assert.strictEqual(blog.url, updatedBlog.url)
